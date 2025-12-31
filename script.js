@@ -35,15 +35,7 @@ document.querySelectorAll('.section').forEach(section => {
 
 // Image hover effect - handled by CSS
 
-// Gallery item click animation
-document.querySelectorAll('.gallery-item').forEach(item => {
-    item.addEventListener('click', function() {
-        this.style.animation = 'none';
-        setTimeout(() => {
-            this.style.animation = 'galleryPulse 0.6s ease-out';
-        }, 10);
-    });
-});
+// Gallery item click animation - removed to prevent conflict with modal
 
 // Add animation keyframes dynamically
 const style = document.createElement('style');
@@ -414,6 +406,70 @@ if (modalOverlay) {
         }
     });
 }
+
+// Image Modal (Lightbox) functionality
+const imageModalOverlay = document.getElementById('imageModalOverlay');
+const imageModalImg = document.getElementById('imageModalImg');
+const imageModalClose = document.getElementById('imageModalClose');
+
+// Function to open image modal
+function openImageModal(imageSrc, imageAlt) {
+    if (imageModalImg && imageModalOverlay) {
+        imageModalImg.src = imageSrc;
+        imageModalImg.alt = imageAlt || 'Изображение';
+        imageModalOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+}
+
+// Function to close image modal
+function closeImageModal() {
+    if (imageModalOverlay) {
+        imageModalOverlay.classList.remove('show');
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+}
+
+// Add click handlers to all images
+document.querySelectorAll('.photo, .gallery-item, .character-photo').forEach(image => {
+    image.addEventListener('click', function(e) {
+        e.preventDefault();
+        const imageSrc = this.src;
+        const imageAlt = this.alt || 'Изображение';
+        openImageModal(imageSrc, imageAlt);
+    });
+});
+
+// Close modal handlers
+if (imageModalClose) {
+    imageModalClose.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeImageModal();
+    });
+}
+
+if (imageModalOverlay) {
+    // Close on click outside the image
+    imageModalOverlay.addEventListener('click', function(e) {
+        if (e.target === imageModalOverlay) {
+            closeImageModal();
+        }
+    });
+    
+    // Prevent closing when clicking on the image itself
+    if (imageModalImg) {
+        imageModalImg.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+}
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && imageModalOverlay && imageModalOverlay.classList.contains('show')) {
+        closeImageModal();
+    }
+});
 
 // Initialize
 console.log('Website loaded successfully! 🎉');
